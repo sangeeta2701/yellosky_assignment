@@ -1,14 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:yellosky_assignment/Screens/Auth/login_screen.dart';
+import 'package:yellosky_assignment/Screens/main_screen.dart';
 import 'package:yellosky_assignment/utils/colors.dart';
 import 'package:yellosky_assignment/utils/constant.dart';
 
-void main() {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(
-  // );
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+  );
   runApp(const MyApp());
 }
 
@@ -16,6 +18,15 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
+  Widget _getInitialScreen() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // User is already logged in
+      return MainScreen();
+    } else {
+      // User is not logged in
+      return LoginScreen();
+    }}
   @override
   Widget build(BuildContext context) {
      return ScreenUtilInit(
@@ -25,7 +36,7 @@ class MyApp extends StatelessWidget {
         builder: (_, child) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: LoginScreen(),
+            home: _getInitialScreen(),
             theme: ThemeData(
           primarySwatch: Colors.blue,
           primaryColor: themeColor,

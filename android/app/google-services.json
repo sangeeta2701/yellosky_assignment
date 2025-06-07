@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "176428028292",
+    "project_id": "yellosky-assignment",
+    "storage_bucket": "yellosky-assignment.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:176428028292:android:bc1da5c9851dd7bb1c4dd1",
+        "android_client_info": {
+          "package_name": "com.example.yellosky_assignment"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBAoHLxaXDOJWvDPC5r5HO8T016uMppVE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

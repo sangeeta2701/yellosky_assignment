@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:yellosky_assignment/Controller/authController.dart';
 import 'package:yellosky_assignment/Screens/Auth/signup_screen.dart';
-import 'package:yellosky_assignment/Screens/main_screen.dart';
 import 'package:yellosky_assignment/Widget/customThemeButton.dart';
 import 'package:yellosky_assignment/Widget/sizedbox.dart';
 import 'package:yellosky_assignment/utils/colors.dart';
-import 'package:yellosky_assignment/utils/constant.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
   @override
@@ -19,46 +15,11 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   // final FirebaseAuth _auth = FirebaseAuth.instance;
-  String _errorMessage = '';
    bool _isObscured = true;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  // void _loginMethod() async {
-  //   setState(() {
-  //     _errorMessage = '';
-  //   });
-
-  //   try {
-  //     await _auth.signInWithEmailAndPassword(
-  //       email: emailController.text,
-  //       password: passwordController.text,
-  //     );
-  //     Fluttertoast.showToast(msg: "Login Successful!!");
-  //     // ignore: use_build_context_synchronously
-  //     // Navigator.pushReplacement(
-  //     //   context,
-  //     //   // MaterialPageRoute(builder: (context) => HomeScreen()),
-  //     // );
-  //   } on FirebaseAuthException catch (e) {
-  //     if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-  //       setState(() {
-  //         _errorMessage = 'Invalid Credentials';
-  //         Fluttertoast.showToast(msg: _errorMessage);
-  //       });
-  //     } else {
-  //       setState(() {
-  //         _errorMessage = 'An error occurred. Please try again.';
-  //         Fluttertoast.showToast(msg: _errorMessage);
-  //       });
-  //     }
-  //   } catch (e) {
-  //     setState(() {
-  //       _errorMessage = 'An error occurred. Please try again.';
-  //       Fluttertoast.showToast(msg: _errorMessage);
-  //     });
-  //   }
-  // }
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -98,16 +59,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(hintText: "Email",
                   hintStyle:GoogleFonts.poppins(
     fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor)),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "Please Enter email";
-                    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                        .hasMatch(value)) {
-                      return "Enter Correct email";
-                    } else {
-                      return null;
-                    }
-                  },
+                  // validator: (value) {
+                  //   if (value!.isEmpty) {
+                  //     return "Please Enter email";
+                  //   } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                  //       .hasMatch(value)) {
+                  //     return "Enter Correct email";
+                  //   } else {
+                  //     return null;
+                  //   }
+                  // }, 
+                 
+                      validator: (val) => val!.isEmpty ? 'Enter email' : null,
                 ),
                 height20,
                 TextFormField(
@@ -151,44 +114,62 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: TextButton(onPressed: (){}, child: Text("Forget Password", style: GoogleFonts.poppins(
     fontSize: 13.sp, fontWeight: FontWeight.w600, color: themeColor))),),
                 height40,
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        customThemeButton("Login", () {
-                          if (_formKey.currentState!.validate()) {
-                            // _loginMethod();
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
-                          }
-                        }),
-                       
-                          height20,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Don't have an account?",
-                              style: GoogleFonts.poppins(
-    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
-                            ),
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              SignupScreen()));
-                                },
-                                child: Text(
-                                  "Signup",
-                                  style:     GoogleFonts.poppins(
-    fontSize: 13.sp, fontWeight: FontWeight.w600, color: themeColor),
-                                ))
-                          ],
-                        )
-                      ]),
+                // customThemeButton("Login", () {
+                //   if (_formKey.currentState!.validate()) {
+                //   Authcontroller.loginUser(context: context, email: emailController.text, password: passwordController.text);
+                //   }
+                // }),
+                Center(
+                  child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: themeColor,
+                                shape: RoundedRectangleBorder(
+                                  
+                                  borderRadius: BorderRadius.circular(8),
+                                )
+                              ),
+                              onPressed: (){
+                                if(_formKey.currentState!.validate()){
+                                                    Authcontroller.loginUser(context: context, email: emailController.text, password: passwordController.text);
+                  
+                                }
+                              }, child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 6,horizontal: 28),
+                                child: _isLoading? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: themeColor,
+                                          strokeWidth: 2,
+                                        ),
+                                      ) as Widget :Text("Login",style: GoogleFonts.poppins(
+                      fontSize: 12.sp, fontWeight: FontWeight.w600, color: wColor),),
+                              )),
+                ),
+                                     
+                  height20,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account?",
+                      style: GoogleFonts.poppins(
+                                    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      SignupScreen()));
+                        },
+                        child:Text(
+                          "Signup",
+                          style:     GoogleFonts.poppins(
+                                    fontSize: 13.sp, fontWeight: FontWeight.w600, color: themeColor),
+                        ))
+                  ],
                 ),
               ],
             ),

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:yellosky_assignment/Controller/authController.dart';
 import 'package:yellosky_assignment/Screens/Auth/login_screen.dart';
-import 'package:yellosky_assignment/Widget/customThemeButton.dart';
 import 'package:yellosky_assignment/Widget/sizedbox.dart';
 import 'package:yellosky_assignment/utils/colors.dart';
-import 'package:yellosky_assignment/utils/constant.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -19,15 +16,17 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   // final FirebaseAuth _auth = FirebaseAuth.instance;
-  String _errorMessage = '';
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-    TextEditingController confirmpasswordController = TextEditingController();
+  TextEditingController confirmpasswordController = TextEditingController();
 
   bool _isObscured = true;
   bool _isObscured1 = true;
+  bool _isLoading = false;
+  
 
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,34 +44,43 @@ class _SignupScreenState extends State<SignupScreen> {
                   height40,
                   Text(
                     "Signup",
-                    style:GoogleFonts.poppins(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                          color: themeColor,
-                        )
-                       
+                    style: GoogleFonts.poppins(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: themeColor,
+                    ),
                   ),
                   height12,
                   Text(
                     "Create account to get started...",
                     style: GoogleFonts.poppins(
-    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
+                      color: bColor,
+                    ),
                   ),
                   height40,
                   TextFormField(
                     controller: nameController,
                     style: GoogleFonts.poppins(
-    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
+                      color: bColor,
+                    ),
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: "Name",
                       hintStyle: GoogleFonts.poppins(
-    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w400,
+                        color: bColor,
+                      ),
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Please Enter name";
-                      } if (value.length < 5) {
+                      }
+                      if (value.length < 3) {
                         return "Name can't be less than 3 characters";
                       }
                       if (value.length > 15) {
@@ -86,12 +94,18 @@ class _SignupScreenState extends State<SignupScreen> {
                   TextFormField(
                     controller: emailController,
                     style: GoogleFonts.poppins(
-    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
+                      color: bColor,
+                    ),
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: "Email",
                       hintStyle: GoogleFonts.poppins(
-    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w400,
+                        color: bColor,
+                      ),
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -109,13 +123,19 @@ class _SignupScreenState extends State<SignupScreen> {
                   TextFormField(
                     controller: passwordController,
                     style: GoogleFonts.poppins(
-    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
+                      color: bColor,
+                    ),
                     obscureText: _isObscured,
                     keyboardType: TextInputType.visiblePassword,
                     decoration: InputDecoration(
                       hintText: "Password",
                       hintStyle: GoogleFonts.poppins(
-    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w400,
+                        color: bColor,
+                      ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isObscured ? Icons.visibility_off : Icons.visibility,
@@ -146,16 +166,24 @@ class _SignupScreenState extends State<SignupScreen> {
                   TextFormField(
                     controller: confirmpasswordController,
                     style: GoogleFonts.poppins(
-    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
+                      color: bColor,
+                    ),
                     obscureText: _isObscured1,
                     keyboardType: TextInputType.visiblePassword,
                     decoration: InputDecoration(
                       hintText: "Confirm Password",
                       hintStyle: GoogleFonts.poppins(
-    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w400,
+                        color: bColor,
+                      ),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _isObscured1 ? Icons.visibility_off : Icons.visibility,
+                          _isObscured1
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: bColor.withOpacity(0.5),
                         ),
                         onPressed: () {
@@ -166,54 +194,89 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                     validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          if (value != passwordController.text) {
-                            return 'Passwords do not match';
-                          }
-                          return null;
-                        },
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      if (value != passwordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
                   ),
                   height40,
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        customThemeButton("Signup", () {
-                          if (_formKey.currentState!.validate()) {
-                            // _loginMethod();
-                          }
-                        }),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Already have an account?",
-                              style: GoogleFonts.poppins(
-    fontSize: 12.sp, fontWeight: FontWeight.w400, color: bColor),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LoginScreen(),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                "Login",
-                                style: GoogleFonts.poppins(
-    fontSize: 13.sp, fontWeight: FontWeight.w600, color: themeColor)
+                  // customThemeButton("Signup", () {
+                  //   Authcontroller.registerUser(
+                  //     context: context,
+                  //     name: nameController.text,
+                  //     email: emailController.text,
+                  //     password: passwordController.text,
+                  //     confirmPassword: confirmpasswordController.text,
+                  //   );
+                  // }), 
+                   Center(
+                     child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: themeColor,
+                                shape: RoundedRectangleBorder(
+                                  
+                                  borderRadius: BorderRadius.circular(8),
+                                )
                               ),
-                            ),
-                          ],
+                              onPressed: (){
+                                if(_formKey.currentState!.validate()){
+                                    Authcontroller.registerUser(
+                        context: context,
+                        name: nameController.text,
+                        email: emailController.text,
+                        password: passwordController.text,
+                        confirmPassword: confirmpasswordController.text,
+                      );
+                     
+                                }
+                              }, child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 6,horizontal: 28),
+                                child: _isLoading? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: themeColor,
+                                          strokeWidth: 2,
+                                        ),
+                                      ) as Widget: Text("Signup",style: GoogleFonts.poppins(
+                         fontSize: 12.sp, fontWeight: FontWeight.w600, color: wColor),),
+                              )),
+                   ),
+                            height20,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Already have an account?",
+                        style: GoogleFonts.poppins(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w400,
+                          color: bColor,
                         ),
-                      ],
-                    ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Login",
+                          style: GoogleFonts.poppins(
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w600,
+                            color: themeColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
