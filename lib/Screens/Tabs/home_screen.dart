@@ -5,8 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yellosky_assignment/Controller/authController.dart';
 import 'package:yellosky_assignment/Model/projectModel.dart';
-import 'package:yellosky_assignment/Screens/product_detail_screen.dart';
-
+import 'package:yellosky_assignment/Screens/project_detail_screen.dart';
 import 'package:yellosky_assignment/Widget/projectContainer.dart';
 import 'package:yellosky_assignment/Widget/sizedbox.dart';
 import 'package:yellosky_assignment/utils/colors.dart';
@@ -22,16 +21,20 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
 
-  //fetching data from firebase
-  Future<List<ProjectModel>> fetchProjects() async {
+  Future<void> fetchProjects() async {
     final snapshot =
         await FirebaseFirestore.instance.collection('projects').get();
-    return snapshot.docs
-        .map((doc) => ProjectModel.fromMap(doc.data(), doc.id))
-        .toList();
-  }
+    final projects =
+        snapshot.docs
+            .map((doc) => ProjectModel.fromMap(doc.data(), doc.id))
+            .toList();
 
-  late Future<List<ProjectModel>> _projectsFuture;
+    setState(() {
+      allProjects = projects;
+      filteredProjects = projects;
+      isLoading = false;
+    });
+  }
 
   @override
   void initState() {
@@ -39,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       fetchUsername();
     });
-    _projectsFuture = fetchProjects();
+    fetchProjects();
   }
 
   String? userName;
@@ -66,6 +69,23 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = false;
       });
     }
+  }
+
+  //serach feature
+  List<ProjectModel> allProjects = [];
+  List<ProjectModel> filteredProjects = [];
+
+  //serach project
+  void searchProjects(String query) {
+    final results =
+        allProjects.where((project) {
+          final name = project.name.toLowerCase();
+          return name.contains(query.toLowerCase());
+        }).toList();
+
+    setState(() {
+      filteredProjects = results;
+    });
   }
 
   @override
@@ -107,11 +127,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-        
+
                 height20,
                 TextField(
                   controller: searchController,
-                  // onChanged: searchPatients,
+                  onChanged: searchProjects,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.symmetric(horizontal: 12),
                     hintText: "Search...",
@@ -126,61 +146,46 @@ class _HomeScreenState extends State<HomeScreen> {
                 height20,
                 Text("Recent Projects", style: blackSubHeadingStyl),
                 height12,
-                FutureBuilder<List<ProjectModel>>(
-  future: _projectsFuture,
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return Center(child: CircularProgressIndicator());
-    } else if (snapshot.hasError) {
-      return Center(child: Text("Error: ${snapshot.error}"));
-    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-      return Center(child: Text("No projects found."));
-    }
-
-    final projects = snapshot.data!;
-    final double itemHeight = 250.h; // Estimated height for each ProjectContainer
-    final double totalHeight = projects.length * itemHeight;
-
-    return SizedBox(
-      height: totalHeight,
-      child: ListView.builder(
-        physics: NeverScrollableScrollPhysics(), // Important: Prevent inner scroll
-        itemCount: projects.length,
-        itemBuilder: (context, index) {
-          final project = projects[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: ProjectContainer(
-              projectImage:
-                  "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*8Ts9_oEByDWlShu3kj9X9g.png",
-              projectName: project.name,
-              projectId: project.id,
-              projectLocation: project.locationName,
-              projectDesc: project.description,
-              ontap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProjectDetailScreen(
-                      proId: project.id,
-                      projectName: project.name,
-                      projectDesc: project.description,
-                      projectlocation: project.locationName,
-                      projectImage:
-                          "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*8Ts9_oEByDWlShu3kj9X9g.png",
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
-    );
-  },
-),
-
-        
+                isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : (filteredProjects.isEmpty
+                        ? Center(child: Text("No projects found."))
+                        : ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: filteredProjects.length,
+                          itemBuilder: (context, index) {
+                            final project = filteredProjects[index];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: ProjectContainer(
+                                projectImage:
+                                    "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*8Ts9_oEByDWlShu3kj9X9g.png",
+                                projectName: project.name,
+                                projectId: project.id,
+                                projectLocation: project.locationName,
+                                projectDesc: project.description,
+                                ontap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => ProjectDetailScreen(
+                                            proId: project.id,
+                                            projectName: project.name,
+                                            projectDesc: project.description,
+                                            projectlocation:
+                                                project.locationName,
+                                            projectImage:
+                                                "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*8Ts9_oEByDWlShu3kj9X9g.png",
+                                          ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        )),
               ],
             ),
           ),

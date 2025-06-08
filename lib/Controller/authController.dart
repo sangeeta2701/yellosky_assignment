@@ -95,24 +95,29 @@ class Authcontroller {
     }
 
     try {
-      // Attempt login
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-      final userCredential = await _auth.signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      );
+  // Attempt login
+  final userCredential = await _auth.signInWithEmailAndPassword(
+    email: email.trim(),
+    password: password.trim(),
+  );
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      await prefs.setString('uid', uid); 
+  final uid = userCredential.user?.uid;
 
+  if (uid == null) {
+    showSnackbar(context, "User ID not found. Please try again.");
+    return;
+  }
 
-      // Navigate to MainScreen on success
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => MainScreen()),
-      );
-    } on FirebaseAuthException catch (e) {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('isLoggedIn', true);
+  await prefs.setString('uid', uid);
+
+  // Navigate to MainScreen on success
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (_) => MainScreen()),
+  );
+} on FirebaseAuthException catch (e) {
       String errorMessage = "Login failed. Please try again.";
       if (e.code == 'user-not-found') {
         errorMessage = "No user found with this email.";
@@ -138,6 +143,7 @@ class Authcontroller {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
+    showSnackbar(context, "Logout Successful");
 
     // Navigate back to login screen
     Navigator.pushAndRemoveUntil(

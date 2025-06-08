@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:yellosky_assignment/Controller/authController.dart';
 import 'package:yellosky_assignment/Screens/Auth/signup_screen.dart';
-import 'package:yellosky_assignment/Widget/customThemeButton.dart';
 import 'package:yellosky_assignment/Widget/sizedbox.dart';
 import 'package:yellosky_assignment/utils/colors.dart';
 class LoginScreen extends StatefulWidget {
@@ -70,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   //   }
                   // }, 
                  
-                      validator: (val) => val!.isEmpty ? 'Enter email' : null,
+                      // validator: (val) => val!.isEmpty ? 'Enter email' : null,
                 ),
                 height20,
                 TextFormField(
@@ -128,18 +127,39 @@ class _LoginScreenState extends State<LoginScreen> {
                                   borderRadius: BorderRadius.circular(8),
                                 )
                               ),
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
-                                                    Authcontroller.loginUser(context: context, email: emailController.text, password: passwordController.text);
+                              // onPressed: (){
+                              //   if(_formKey.currentState!.validate()){
+                              //                       Authcontroller.loginUser(context: context, email: emailController.text, password: passwordController.text);
                   
-                                }
-                              }, child: Padding(
+                              //   }
+                              // }, 
+                              onPressed: () async {
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await Authcontroller.loginUser(
+        context: context,
+        email: emailController.text,
+        password: passwordController.text,
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+},
+
+                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 6,horizontal: 28),
                                 child: _isLoading? const SizedBox(
                                         width: 20,
                                         height: 20,
                                         child: CircularProgressIndicator(
-                                          color: themeColor,
+                                          color: wColor,
                                           strokeWidth: 2,
                                         ),
                                       ) as Widget :Text("Login",style: GoogleFonts.poppins(

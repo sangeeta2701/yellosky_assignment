@@ -76,8 +76,8 @@ class _MainScreenState extends State<MainScreen> {
     ],
   ),
   child: AnimatedBottomNavigationBar(
-    elevation: 0, // remove default elevation since shadow is manually added
-    backgroundColor: Colors.transparent, // transparent to let container bg show
+    elevation: 0, 
+    backgroundColor: Colors.transparent,
     icons: iconList,
     iconSize: 30,
     activeColor: themeColor,

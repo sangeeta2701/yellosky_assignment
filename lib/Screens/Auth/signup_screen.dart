@@ -24,9 +24,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _isObscured = true;
   bool _isObscured1 = true;
   bool _isLoading = false;
-  
 
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,49 +202,66 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                   ),
                   height40,
-                  // customThemeButton("Signup", () {
-                  //   Authcontroller.registerUser(
-                  //     context: context,
-                  //     name: nameController.text,
-                  //     email: emailController.text,
-                  //     password: passwordController.text,
-                  //     confirmPassword: confirmpasswordController.text,
-                  //   );
-                  // }), 
-                   Center(
-                     child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: themeColor,
-                                shape: RoundedRectangleBorder(
-                                  
-                                  borderRadius: BorderRadius.circular(8),
-                                )
-                              ),
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
-                                    Authcontroller.registerUser(
-                        context: context,
-                        name: nameController.text,
-                        email: emailController.text,
-                        password: passwordController.text,
-                        confirmPassword: confirmpasswordController.text,
-                      );
-                     
-                                }
-                              }, child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 6,horizontal: 28),
-                                child: _isLoading? const SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          color: themeColor,
-                                          strokeWidth: 2,
-                                        ),
-                                      ) as Widget: Text("Signup",style: GoogleFonts.poppins(
-                         fontSize: 12.sp, fontWeight: FontWeight.w600, color: wColor),),
-                              )),
-                   ),
-                            height20,
+
+                  Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: themeColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          setState(() {
+                            _isLoading = true;
+                          });
+
+                          try {
+                            await Authcontroller.registerUser(
+                              context: context,
+                              name: nameController.text,
+                              email: emailController.text,
+                              password: passwordController.text,
+                              confirmPassword: confirmpasswordController.text,
+                            );
+                          } finally {
+                            setState(() {
+                              _isLoading = false;
+                            });
+                          }
+                        }
+                      },
+
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 6,
+                          horizontal: 28,
+                        ),
+                        child:
+                            _isLoading
+                                ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: wColor,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                    as Widget
+                                : Text(
+                                  "Signup",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: wColor,
+                                  ),
+                                ),
+                      ),
+                    ),
+                  ),
+                  height20,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
