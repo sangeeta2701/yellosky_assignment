@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:yellosky_assignment/Model/projectModel.dart';
 import 'package:yellosky_assignment/Screens/project_detail_screen.dart';
-import 'package:yellosky_assignment/utils/colors.dart';
-import 'package:yellosky_assignment/utils/constant.dart';
+import 'package:yellosky_assignment/secret.dart';
+
 
 
 class MapScreen extends StatefulWidget {
@@ -19,7 +18,7 @@ class _MapScreenState extends State<MapScreen> {
   late GoogleMapController _mapController;
   Set<Marker> _markers = {};
   List<ProjectModel> allProjects = [];
-  final apiKey = "AIzaSyALXwTH5HU_YFdIUJ83N9V_U1OyUIJ_yh4";
+  final apiKey = Secrets.apiKey;
 
   @override
   void initState() {
