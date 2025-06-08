@@ -30,3 +30,5 @@ TextStyle blackSubHeadingStyl = GoogleFonts.poppins(
     fontSize: 14.sp, fontWeight: FontWeight.w500, color: bColor);
 TextStyle greyContentStyle = GoogleFonts.poppins(
     fontSize: 12.sp, fontWeight: FontWeight.w400, color: gColor);
+TextStyle appBarStrle = GoogleFonts.poppins(
+    fontSize: 16.sp, fontWeight: FontWeight.w600, color: wColor);
